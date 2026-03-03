@@ -101,9 +101,31 @@ export async function POST(req: NextRequest) {
       data: { refreshToken, lastLoginAt: new Date() },
     });
 
+    // Criar notificação de boas-vindas
+    try {
+      await db.notification.create({
+        data: {
+          userId: user.id,
+          title: "Bem-vindo ao ImobiERP! \uD83C\uDF89",
+          message: `Olá ${name}! Sua conta foi criada com sucesso. Você tem ${trialDays} dias de teste gratuito para explorar todas as funcionalidades do sistema. Aproveite!`,
+          type: "SUCCESS",
+          link: "/configuracoes?tab=plano",
+        },
+      });
+    } catch (e) {
+      console.error("Failed to create welcome notification:", e);
+    }
+
+    // Calcular trial info para retornar ao frontend
+    const trialDaysLeft = Math.max(0, Math.ceil((trialExpiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+
     return successResponse(
       {
-        user,
+        user: {
+          ...user,
+          trialDaysLeft,
+          trialExpired: false,
+        },
         accessToken,
         refreshToken,
       },

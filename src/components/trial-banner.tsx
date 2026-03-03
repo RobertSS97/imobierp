@@ -11,11 +11,11 @@ export function TrialBanner() {
 
   if (!user || dismissed) return null;
 
-  const trialDaysLeft = (user as any).trialDaysLeft as number | null;
+  const trialDaysLeft = (user as any).trialDaysLeft as number | undefined | null;
   const trialExpired = (user as any).trialExpired as boolean;
 
   // Plano sem trial ou trial com mais de 5 dias: não mostra
-  if (trialDaysLeft === null || (!trialExpired && trialDaysLeft > 5)) return null;
+  if (trialDaysLeft == null || (!trialExpired && trialDaysLeft > 5)) return null;
 
   if (trialExpired) {
     return (
