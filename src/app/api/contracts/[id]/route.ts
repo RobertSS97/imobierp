@@ -5,6 +5,7 @@ import {
   successResponse,
   errorResponse,
   createHistoryLog,
+  sanitizeUpdateData,
 } from "@/lib/api-helpers";
 
 interface RouteParams {
@@ -104,16 +105,18 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       "readjustmentIndex", "readjustmentMonth", "status",
     ];
 
-    const updateData: Record<string, any> = {};
+    const rawData: Record<string, any> = {};
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        updateData[field] = body[field];
+        rawData[field] = body[field];
       }
     }
 
-    // Converter datas
-    if (updateData.startDate) updateData.startDate = new Date(updateData.startDate);
-    if (updateData.endDate) updateData.endDate = new Date(updateData.endDate);
+    const updateData = sanitizeUpdateData(
+      rawData,
+      ["depositType", "readjustmentIndex", "status"],
+      ["startDate", "endDate"],
+    );
 
     const contract = await db.contract.update({
       where: { id },

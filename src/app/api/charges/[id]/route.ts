@@ -5,6 +5,7 @@ import {
   successResponse,
   errorResponse,
   createHistoryLog,
+  sanitizeUpdateData,
 } from "@/lib/api-helpers";
 
 interface RouteParams {
@@ -93,20 +94,19 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       "discountValue", "notes",
     ];
 
-    const updateData: Record<string, any> = {};
+    const rawData: Record<string, any> = {};
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        updateData[field] = body[field];
+        rawData[field] = body[field];
       }
     }
 
-    // Converter tipos
-    if (updateData.value) updateData.value = parseFloat(updateData.value);
-    if (updateData.dueDate) updateData.dueDate = new Date(updateData.dueDate);
-    if (updateData.paymentDate) updateData.paymentDate = new Date(updateData.paymentDate);
-    if (updateData.penaltyValue) updateData.penaltyValue = parseFloat(updateData.penaltyValue);
-    if (updateData.interestValue) updateData.interestValue = parseFloat(updateData.interestValue);
-    if (updateData.discountValue) updateData.discountValue = parseFloat(updateData.discountValue);
+    const updateData = sanitizeUpdateData(
+      rawData,
+      ["type", "status", "paymentMethod"],
+      ["dueDate", "paymentDate"],
+      ["value", "penaltyValue", "interestValue", "discountValue"]
+    );
 
     // Se marcou como pago, registrar data de pagamento
     if (updateData.status === "PAID" && !updateData.paymentDate) {

@@ -9,6 +9,7 @@ import {
   parseSort,
   validateRequired,
   createHistoryLog,
+  sanitizeBody,
 } from "@/lib/api-helpers";
 
 // ─── GET /api/owners ──────────────────────────────────────────────
@@ -83,29 +84,31 @@ export async function POST(req: NextRequest) {
       return errorResponse("Já existe um proprietário com este CPF/CNPJ", 409);
     }
 
+    const safe = sanitizeBody(body, ["bankAccountType", "status"]);
+
     const owner = await db.owner.create({
       data: {
         userId: auth.userId,
         name: body.name,
         email: body.email,
         phone: body.phone,
-        whatsapp: body.whatsapp,
+        whatsapp: body.whatsapp || undefined,
         cpfCnpj: body.cpfCnpj,
-        rg: body.rg,
-        street: body.street,
-        number: body.number,
-        complement: body.complement,
-        neighborhood: body.neighborhood,
-        city: body.city,
-        state: body.state,
-        zipCode: body.zipCode,
-        bankName: body.bankName,
-        bankAgency: body.bankAgency,
-        bankAccount: body.bankAccount,
-        bankAccountType: body.bankAccountType,
-        pixKey: body.pixKey,
-        status: body.status || "ACTIVE",
-        notes: body.notes,
+        rg: body.rg || undefined,
+        street: body.street || undefined,
+        number: body.number || undefined,
+        complement: body.complement || undefined,
+        neighborhood: body.neighborhood || undefined,
+        city: body.city || undefined,
+        state: body.state || undefined,
+        zipCode: body.zipCode || undefined,
+        bankName: body.bankName || undefined,
+        bankAgency: body.bankAgency || undefined,
+        bankAccount: body.bankAccount || undefined,
+        bankAccountType: safe.bankAccountType || undefined,
+        pixKey: body.pixKey || undefined,
+        status: safe.status || "ACTIVE",
+        notes: body.notes || undefined,
       },
     });
 

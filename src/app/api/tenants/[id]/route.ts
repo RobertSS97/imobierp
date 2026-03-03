@@ -5,6 +5,7 @@ import {
   successResponse,
   errorResponse,
   createHistoryLog,
+  sanitizeUpdateData,
 } from "@/lib/api-helpers";
 
 interface RouteParams {
@@ -108,16 +109,19 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       "status", "notes",
     ];
 
-    const updateData: Record<string, any> = {};
+    const rawData: Record<string, any> = {};
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        updateData[field] = body[field];
+        rawData[field] = body[field];
       }
     }
 
-    // Converter tipos
-    if (updateData.dateOfBirth) updateData.dateOfBirth = new Date(updateData.dateOfBirth);
-    if (updateData.income) updateData.income = parseFloat(updateData.income);
+    const updateData = sanitizeUpdateData(
+      rawData,
+      ["maritalStatus", "status"],
+      ["dateOfBirth"],
+      ["income"]
+    );
 
     const tenant = await db.tenant.update({
       where: { id },

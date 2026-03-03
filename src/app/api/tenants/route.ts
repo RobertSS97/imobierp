@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
         cpf: body.cpf,
         rg: body.rg,
         dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : undefined,
-        maritalStatus: body.maritalStatus,
+        maritalStatus: body.maritalStatus || undefined,
         profession: body.profession,
         income: body.income ? parseFloat(body.income) : undefined,
         street: body.street,

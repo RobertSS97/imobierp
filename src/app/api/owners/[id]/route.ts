@@ -5,6 +5,7 @@ import {
   successResponse,
   errorResponse,
   createHistoryLog,
+  sanitizeUpdateData,
 } from "@/lib/api-helpers";
 
 interface RouteParams {
@@ -97,12 +98,17 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       "status", "notes",
     ];
 
-    const updateData: Record<string, any> = {};
+    const rawData: Record<string, any> = {};
     for (const field of allowedFields) {
       if (body[field] !== undefined) {
-        updateData[field] = body[field];
+        rawData[field] = body[field];
       }
     }
+
+    const updateData = sanitizeUpdateData(
+      rawData,
+      ["bankAccountType", "status"],
+    );
 
     const owner = await db.owner.update({
       where: { id },

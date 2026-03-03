@@ -1,5 +1,43 @@
 import { NextResponse } from "next/server";
 
+// ─── Sanitizar body: converte "" em undefined para campos opcionais ──
+// Evita enviar strings vazias para campos enum do Prisma
+export function sanitizeBody(body: Record<string, any>, enumFields: string[]): Record<string, any> {
+  const cleaned = { ...body };
+  for (const field of enumFields) {
+    if (cleaned[field] === "" || cleaned[field] === undefined) {
+      cleaned[field] = undefined;
+    }
+  }
+  return cleaned;
+}
+
+// Sanitizar dados de update: remove entries com "" para enum e converte tipos
+export function sanitizeUpdateData(
+  data: Record<string, any>,
+  enumFields: string[],
+  dateFields: string[] = [],
+  floatFields: string[] = []
+): Record<string, any> {
+  const cleaned: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value === undefined) continue;
+    if (enumFields.includes(key)) {
+      if (value === "") continue; // skip empty enums
+      cleaned[key] = value;
+    } else if (dateFields.includes(key)) {
+      if (value === "" || value === null) continue;
+      cleaned[key] = new Date(value);
+    } else if (floatFields.includes(key)) {
+      if (value === "" || value === null) continue;
+      cleaned[key] = parseFloat(value);
+    } else {
+      cleaned[key] = value;
+    }
+  }
+  return cleaned;
+}
+
 // ─── Resposta padronizada de sucesso ──────────────────────────────
 export function successResponse<T>(data: T, status = 200, extra?: Record<string, any>) {
   return NextResponse.json({ success: true, data, ...extra }, { status });
