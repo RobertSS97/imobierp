@@ -1,7 +1,7 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { comparePassword, hashPassword } from "@/lib/auth";
-import { successResponse, errorResponse } from "@/lib/api-helpers";
+import { errorResponse } from "@/lib/api-helpers";
 import jwt from "jsonwebtoken";
 
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET || "CHANGE-ME";
@@ -46,21 +46,25 @@ export async function POST(req: NextRequest) {
 
     console.log(`[ADMIN AUTH] Successful login: ${email}`);
 
-    const response = successResponse({
-      admin: {
-        id: admin.id,
-        name: admin.name,
-        email: admin.email,
+    // Usar NextResponse.json + cookies.set (forma oficial do Next.js)
+    const res = NextResponse.json(
+      {
+        success: true,
+        data: {
+          admin: { id: admin.id, name: admin.name, email: admin.email },
+          token,
+        },
       },
-      token,
-    });
-
-    // Set HttpOnly cookie para proteção do middleware
-    const res = new Response(response.body, response);
-    res.headers.set(
-      "Set-Cookie",
-      `imobierp_admin_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${8 * 60 * 60}${process.env.NODE_ENV === "production" ? "; Secure" : ""}`
+      { status: 200 }
     );
+
+    res.cookies.set("imobierp_admin_token", token, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 8 * 60 * 60,
+    });
 
     return res;
   } catch (error: any) {

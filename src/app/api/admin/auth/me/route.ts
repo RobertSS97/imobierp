@@ -7,18 +7,23 @@ const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET 
 
 // ─── GET /api/admin/auth/me ──────────────────────────────────────
 export async function GET(req: NextRequest) {
-  const token =
-    req.cookies.get("imobierp_admin_token")?.value ||
-    req.headers.get("authorization")?.replace("Bearer ", "");
+  const cookieToken = req.cookies.get("imobierp_admin_token")?.value;
+  const headerToken = req.headers.get("authorization")?.replace("Bearer ", "");
+  const token = cookieToken || headerToken;
+
+  console.log(`[ADMIN ME] Cookie present: ${!!cookieToken}, Header present: ${!!headerToken}, Secret length: ${ADMIN_JWT_SECRET.length}`);
 
   if (!token) {
+    console.log("[ADMIN ME] No token found in cookies or headers");
     return errorResponse("Não autenticado", 401);
   }
 
   let payload: { adminId: string; email: string };
   try {
     payload = jwt.verify(token, ADMIN_JWT_SECRET) as { adminId: string; email: string };
-  } catch {
+    console.log(`[ADMIN ME] JWT verified for adminId: ${payload.adminId}`);
+  } catch (err: any) {
+    console.error(`[ADMIN ME] JWT verify failed: ${err.message}`);
     return errorResponse("Token inválido ou expirado", 401);
   }
 
