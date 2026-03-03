@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  # ─── PostgreSQL ────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: imobierp-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-imobierp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-imobierp_secret_2024}
+      POSTGRES_DB: ${POSTGRES_DB:-imobierp}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-imobierp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - imobierp-network
+
+  # ─── ImobiERP App ──────────────────────────────────────────────
+  app:
+    image: robertn64/imobierp:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: imobierp-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-imobierp}:${POSTGRES_PASSWORD:-imobierp_secret_2024}@db:5432/${POSTGRES_DB:-imobierp}?schema=public
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+      CRON_SECRET: ${CRON_SECRET:-your-cron-secret-change-me}
+      NEXT_PUBLIC_API_URL: /api
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads_data:/app/public/uploads
+    networks:
+      - imobierp-network
+
+  # ─── Evolution API (WhatsApp) - Opcional ───────────────────────
+  # Descomente para usar WhatsApp local
+  # evolution:
+  #   image: atendai/evolution-api:latest
+  #   container_name: imobierp-evolution
+  #   restart: unless-stopped
+  #   environment:
+  #     SERVER_URL: http://localhost:8080
+  #     AUTHENTICATION_API_KEY: your-evolution-api-key
+  #     DATABASE_ENABLED: true
+  #     DATABASE_PROVIDER: postgresql
+  #     DATABASE_CONNECTION_URI: postgresql://${POSTGRES_USER:-imobierp}:${POSTGRES_PASSWORD:-imobierp_secret_2024}@db:5432/${POSTGRES_DB:-imobierp}?schema=evolution
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - imobierp-network
+
+volumes:
+  postgres_data:
+    driver: local
+  uploads_data:
+    driver: local
+
+networks:
+  imobierp-network:
+    driver: bridge
