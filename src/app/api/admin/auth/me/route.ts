@@ -7,17 +7,22 @@ const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET 
 
 // ─── GET /api/admin/auth/me ──────────────────────────────────────
 export async function GET(req: NextRequest) {
+  const token =
+    req.cookies.get("imobierp_admin_token")?.value ||
+    req.headers.get("authorization")?.replace("Bearer ", "");
+
+  if (!token) {
+    return errorResponse("Não autenticado", 401);
+  }
+
+  let payload: { adminId: string; email: string };
   try {
-    const token =
-      req.cookies.get("imobierp_admin_token")?.value ||
-      req.headers.get("authorization")?.replace("Bearer ", "");
+    payload = jwt.verify(token, ADMIN_JWT_SECRET) as { adminId: string; email: string };
+  } catch {
+    return errorResponse("Token inválido ou expirado", 401);
+  }
 
-    if (!token) {
-      return errorResponse("Não autenticado", 401);
-    }
-
-    const payload = jwt.verify(token, ADMIN_JWT_SECRET) as { adminId: string; email: string };
-
+  try {
     const admin = await db.adminUser.findUnique({
       where: { id: payload.adminId },
       select: { id: true, name: true, email: true, isActive: true, lastLoginAt: true, createdAt: true },
@@ -28,7 +33,8 @@ export async function GET(req: NextRequest) {
     }
 
     return successResponse(admin);
-  } catch {
-    return errorResponse("Token inválido ou expirado", 401);
+  } catch (error) {
+    console.error("[ADMIN ME] DB error:", error);
+    return errorResponse("Erro de conexão com banco de dados", 503);
   }
 }

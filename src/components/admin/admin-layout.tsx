@@ -22,7 +22,15 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     const verify = async () => {
       try {
         const res = await fetch("/api/admin/auth/me", { credentials: "include" });
-        if (!res.ok) throw new Error("Unauthorized");
+        if (res.status === 401) {
+          router.replace("/admin/login");
+          return;
+        }
+        if (!res.ok) {
+          // Erro de banco (503) ou outro — não redirecionar, tentar novamente
+          setTimeout(verify, 3000);
+          return;
+        }
         setVerified(true);
       } catch {
         router.replace("/admin/login");

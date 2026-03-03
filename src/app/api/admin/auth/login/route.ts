@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     const res = new Response(response.body, response);
     res.headers.set(
       "Set-Cookie",
-      `imobierp_admin_token=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${8 * 60 * 60}${process.env.NODE_ENV === "production" ? "; Secure" : ""}`
+      `imobierp_admin_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${8 * 60 * 60}${process.env.NODE_ENV === "production" ? "; Secure" : ""}`
     );
 
     return res;
