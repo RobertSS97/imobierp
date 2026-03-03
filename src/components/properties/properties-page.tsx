@@ -56,13 +56,13 @@ const emptyForm = {
 // Constrói o endereço completo para usar no Google Maps
 function buildFullAddress(p: any): string {
   const parts = [
-    p.addressStreet,
-    p.addressNumber,
-    p.addressNeighborhood,
-    p.addressCity,
-    p.addressState,
+    p.street,
+    p.number,
+    p.neighborhood,
+    p.city,
+    p.state,
   ].filter(Boolean);
-  return parts.join(", ") + (p.addressZipCode ? ` - ${p.addressZipCode}` : "");
+  return parts.join(", ") + (p.zipCode ? ` - ${p.zipCode}` : "");
 }
 
 // URL do embed do Google Maps para um endereço
@@ -116,7 +116,7 @@ export function PropertiesPage() {
 
   // Carregar proprietários para o select
   const { items: ownersList } = useApiList<any>(
-    () => ownersApi.list({ limit: "100", status: "active" }),
+    () => ownersApi.list({ limit: "100", status: "ACTIVE" }),
     []
   );
 
@@ -154,15 +154,24 @@ export function PropertiesPage() {
 
   const handleSubmit = async () => {
     const payload = {
-      ...formData,
+      title: formData.title,
+      type: formData.type,
+      ownerId: formData.ownerId || undefined,
+      street: formData.addressStreet || undefined,
+      number: formData.addressNumber || undefined,
+      complement: formData.addressComplement || undefined,
+      neighborhood: formData.addressNeighborhood || undefined,
+      city: formData.addressCity || undefined,
+      state: formData.addressState || undefined,
+      zipCode: formData.addressZipCode || undefined,
       bedrooms: formData.bedrooms ? Number(formData.bedrooms) : undefined,
       bathrooms: formData.bathrooms ? Number(formData.bathrooms) : undefined,
       parkingSpaces: formData.parkingSpaces ? Number(formData.parkingSpaces) : undefined,
       area: formData.area ? Number(formData.area) : undefined,
       rentValue: formData.rentValue ? Number(formData.rentValue) : undefined,
       condoFee: formData.condoFee ? Number(formData.condoFee) : undefined,
-      iptuValue: formData.iptuValue ? Number(formData.iptuValue) : undefined,
-      ownerId: formData.ownerId || undefined,
+      iptu: formData.iptuValue ? Number(formData.iptuValue) : undefined,
+      description: formData.description || undefined,
     };
     if (editingId) {
       await updateMutation.mutate({ id: editingId, data: payload });
@@ -177,14 +186,14 @@ export function PropertiesPage() {
       const p = response.data;
       setFormData({
         title: p.title || "", type: p.type || "apartment",
-        addressStreet: p.addressStreet || "", addressNumber: p.addressNumber || "",
-        addressComplement: p.addressComplement || "", addressNeighborhood: p.addressNeighborhood || "",
-        addressCity: p.addressCity || "", addressState: p.addressState || "",
-        addressZipCode: p.addressZipCode || "",
+        addressStreet: p.street || "", addressNumber: p.number || "",
+        addressComplement: p.complement || "", addressNeighborhood: p.neighborhood || "",
+        addressCity: p.city || "", addressState: p.state || "",
+        addressZipCode: p.zipCode || "",
         bedrooms: p.bedrooms?.toString() || "", bathrooms: p.bathrooms?.toString() || "",
         parkingSpaces: p.parkingSpaces?.toString() || "", area: p.area?.toString() || "",
         rentValue: p.rentValue?.toString() || "", condoFee: p.condoFee?.toString() || "",
-        iptuValue: p.iptuValue?.toString() || "", ownerId: p.ownerId || "", description: p.description || "",
+        iptuValue: p.iptu?.toString() || "", ownerId: p.ownerId || "", description: p.description || "",
       });
       setEditingId(id);
       setIsDialogOpen(true);
@@ -411,7 +420,7 @@ export function PropertiesPage() {
                             <p className="font-medium text-sm truncate">{p.title}</p>
                             <p className="text-xs text-muted-foreground truncate mt-0.5">
                               <MapPin className="inline h-3 w-3 mr-1" />
-                              {[p.addressStreet, p.addressNumber, p.addressNeighborhood].filter(Boolean).join(", ")}
+                              {[p.street, p.number, p.neighborhood].filter(Boolean).join(", ")}
                             </p>
                             <div className="flex items-center gap-2 mt-2">
                               <Badge className={`text-xs ${propertyStatusColors[p.status as PropertyStatus] || ""}`} variant="secondary">
@@ -527,7 +536,7 @@ export function PropertiesPage() {
                       <TableCell>{propertyTypeLabels[p.type as PropertyType] || p.type}</TableCell>
                       <TableCell>{p.owner?.name || ownersList.find((o: any) => o.id === p.ownerId)?.name || "-"}</TableCell>
                       <TableCell className="text-muted-foreground">
-                        {[p.addressStreet, p.addressNumber, p.addressCity].filter(Boolean).join(", ")}
+                        {[p.street, p.number, p.city].filter(Boolean).join(", ")}
                       </TableCell>
                       <TableCell>{p.bedrooms || "-"}</TableCell>
                       <TableCell>{p.area ? `${p.area}m²` : "-"}</TableCell>

@@ -91,20 +91,19 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const missing = validateRequired(body, [
-      "title", "type", "ownerId", "street", "number",
-      "neighborhood", "city", "state", "zipCode", "rentValue",
-    ]);
+    const missing = validateRequired(body, ["title", "type", "rentValue"]);
     if (missing.length > 0) {
       return errorResponse(`Campos obrigatórios: ${missing.join(", ")}`, 400);
     }
 
-    // Verificar se o proprietário pertence ao usuário
-    const owner = await db.owner.findFirst({
-      where: { id: body.ownerId, userId: auth.userId },
-    });
-    if (!owner) {
-      return errorResponse("Proprietário não encontrado", 404);
+    // Verificar se o proprietário pertence ao usuário (somente se ownerId for informado)
+    if (body.ownerId) {
+      const owner = await db.owner.findFirst({
+        where: { id: body.ownerId, userId: auth.userId },
+      });
+      if (!owner) {
+        return errorResponse("Proprietário não encontrado", 404);
+      }
     }
 
     const property = await db.property.create({
