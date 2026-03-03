@@ -9,6 +9,7 @@ import {
   parseSort,
   validateRequired,
   createHistoryLog,
+  createNotificationIfEnabled,
   sanitizeBody,
 } from "@/lib/api-helpers";
 
@@ -120,6 +121,14 @@ export async function POST(req: NextRequest) {
       owner.id,
       "CREATE",
       `Proprietário "${owner.name}" cadastrado`
+    );
+
+    await createNotificationIfEnabled(
+      db,
+      auth.userId,
+      "Novo proprietário cadastrado",
+      `O proprietário "${owner.name}" foi cadastrado com sucesso.`,
+      "SUCCESS"
     );
 
     return successResponse(owner, 201);

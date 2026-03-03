@@ -9,6 +9,7 @@ import {
   parseSort,
   validateRequired,
   createHistoryLog,
+  createNotificationIfEnabled,
 } from "@/lib/api-helpers";
 
 // ─── GET /api/properties ──────────────────────────────────────────
@@ -143,6 +144,14 @@ export async function POST(req: NextRequest) {
       property.id,
       "CREATE",
       `Imóvel "${property.title}" cadastrado`
+    );
+
+    await createNotificationIfEnabled(
+      db,
+      auth.userId,
+      "Novo imóvel cadastrado",
+      `O imóvel "${property.title}" foi cadastrado com sucesso.`,
+      "SUCCESS"
     );
 
     return successResponse(property, 201);

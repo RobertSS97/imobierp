@@ -181,3 +181,25 @@ export async function createHistoryLog(
     },
   });
 }
+
+// ─── Criar notificação se o usuário tiver a preferência habilitada ─
+export async function createNotificationIfEnabled(
+  db: any,
+  userId: string,
+  title: string,
+  message: string,
+  type: string = "INFO"
+) {
+  try {
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { notifyNewRegister: true },
+    });
+    if (!user?.notifyNewRegister) return;
+    await db.notification.create({
+      data: { userId, title, message, type },
+    });
+  } catch {
+    // Notificação é best-effort, não bloqueia a operação principal
+  }
+}

@@ -38,6 +38,10 @@ export async function GET(req: NextRequest) {
         whatsappApiUrl: true,
         whatsappInstanceName: true,
         emailNotifications: true,
+        notifyNewRegister: true,
+        notifyPayment: true,
+        notifyOverdue: true,
+        notifyExpiring: true,
         autoChargeEnabled: true,
         autoChargeDay: true,
         lateFeePercentage: true,
@@ -86,7 +90,8 @@ export async function PUT(req: NextRequest) {
       "companyNeighborhood", "companyCity", "companyState", "companyZipCode",
       "creciNumber", "creciState", "logo", "primaryColor",
       "whatsappEnabled", "whatsappApiUrl", "whatsappApiKey", "whatsappInstanceName",
-      "emailNotifications", "autoChargeEnabled", "autoChargeDay",
+      "emailNotifications", "notifyNewRegister", "notifyPayment", "notifyOverdue", "notifyExpiring",
+      "autoChargeEnabled", "autoChargeDay",
       "lateFeePercentage", "interestPercentage",
     ];
 

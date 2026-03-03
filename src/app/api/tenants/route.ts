@@ -9,6 +9,7 @@ import {
   parseSort,
   validateRequired,
   createHistoryLog,
+  createNotificationIfEnabled,
 } from "@/lib/api-helpers";
 
 // ─── GET /api/tenants ─────────────────────────────────────────────
@@ -115,6 +116,14 @@ export async function POST(req: NextRequest) {
       tenant.id,
       "CREATE",
       `Inquilino "${tenant.name}" cadastrado`
+    );
+
+    await createNotificationIfEnabled(
+      db,
+      auth.userId,
+      "Novo inquilino cadastrado",
+      `O inquilino "${tenant.name}" foi cadastrado com sucesso.`,
+      "SUCCESS"
     );
 
     return successResponse(tenant, 201);

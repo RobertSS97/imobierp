@@ -93,21 +93,26 @@ export function SettingsPage() {
       try { const saved = localStorage.getItem("imobierp_company_logo"); if (saved) setCompanyLogo(saved); } catch {}
       setCompanyEmail(user.email || "");
       setCompanyPhone(user.phone || "");
-      setStreet(user.addressStreet || "");
-      setNumber(user.addressNumber || "");
-      setComplement(user.addressComplement || "");
-      setNeighborhood(user.addressNeighborhood || "");
-      setZipCode(user.addressZipCode || "");
-      setCity(user.addressCity || "");
-      setState(user.addressState || "");
+      setStreet(user.companyStreet || "");
+      setNumber(user.companyNumber || "");
+      setComplement(user.companyComplement || "");
+      setNeighborhood(user.companyNeighborhood || "");
+      setZipCode(user.companyZipCode || "");
+      setCity(user.companyCity || "");
+      setState(user.companyState || "");
       setWhatsappEnabled(user.whatsappEnabled || false);
       setWhatsappNumber(user.whatsappNumber || "");
       setApiToken(user.whatsappApiToken || "");
       setMessageTemplate(user.whatsappMessageTemplate || "");
       setAutoChargeEnabled(user.autoChargeEnabled ?? true);
-      setChargeDay(user.chargeGenerationDay?.toString() || "");
-      setLateFee(user.defaultLateFeePercent?.toString() || "");
-      setInterest(user.defaultInterestPercent?.toString() || "");
+      setChargeDay(user.autoChargeDay?.toString() || "");
+      setLateFee(user.lateFeePercentage?.toString() || "");
+      setInterest(user.interestPercentage?.toString() || "");
+      setEmailNotifications(user.emailNotifications ?? true);
+      setNotifyNewRegister(user.notifyNewRegister ?? false);
+      setNotifyPayment(user.notifyPayment ?? true);
+      setNotifyOverdue(user.notifyOverdue ?? true);
+      setNotifyExpiring(user.notifyExpiring ?? true);
     }
   }, [user]);
 
@@ -116,8 +121,8 @@ export function SettingsPage() {
     try {
       const result = await authApi.updateProfile({
         companyName, creci, phone: companyPhone,
-        addressStreet: street, addressNumber: number, addressComplement: complement,
-        addressNeighborhood: neighborhood, addressZipCode: zipCode, addressCity: city, addressState: state,
+        companyStreet: street, companyNumber: number, companyComplement: complement,
+        companyNeighborhood: neighborhood, companyZipCode: zipCode, companyCity: city, companyState: state,
       });
       if (result.data) updateUser(result.data);
       toast({ title: "Dados salvos!" });

@@ -48,9 +48,14 @@ export default function DashboardPage() {
   };
 
   const stats = data?.stats || {};
-  const revenueChart = data?.revenueChart || [];
-  const occupancyChart = data?.occupancyChart || {};
-  const recentCharges = data?.recentCharges || {};
+  const revenueChart = data?.revenueData || [];
+  const occupancyChart = {
+    rented: stats.rentedProperties ?? 0,
+    available: stats.availableProperties ?? 0,
+    maintenance: stats.maintenanceProperties ?? 0,
+  };
+  const overdueCharges = data?.recentOverdueCharges || [];
+  const pendingCharges = data?.recentPendingCharges || [];
   const expiringContracts = data?.expiringContracts || [];
   const recentActivity = data?.recentActivity || [];
 
@@ -128,14 +133,14 @@ export default function DashboardPage() {
             <StatsCard
               title="Cobranças Pendentes"
               value={stats.pendingCharges || 0}
-              description={`${formatCurrency(stats.pendingAmount || 0)} em valores pendentes`}
+              description={`${formatCurrency(stats.pendingChargesValue || 0)} em valores pendentes`}
               icon={TrendingUp}
               privacyMode={privacyMode}
             />
             <StatsCard
               title="Cobranças Vencidas"
               value={stats.overdueCharges || 0}
-              description={`${formatCurrency(stats.overdueAmount || 0)} em atraso`}
+              description={`${formatCurrency(stats.overdueChargesValue || 0)} em atraso`}
               icon={AlertTriangle}
               privacyMode={privacyMode}
             />
@@ -156,8 +161,8 @@ export default function DashboardPage() {
 
           {/* Tables */}
           <div className="grid gap-4 lg:grid-cols-2">
-            <RecentChargesTable type="overdue" charges={recentCharges.overdue || []} privacyMode={privacyMode} />
-            <RecentChargesTable type="pending" charges={recentCharges.pending || []} privacyMode={privacyMode} />
+            <RecentChargesTable type="overdue" charges={overdueCharges} privacyMode={privacyMode} />
+            <RecentChargesTable type="pending" charges={pendingCharges} privacyMode={privacyMode} />
           </div>
 
           {/* Expiring Contracts and Activity */}

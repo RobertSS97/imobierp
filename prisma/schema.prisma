@@ -54,6 +54,10 @@ model User {
   whatsappApiKey        String?
   whatsappInstanceName  String?
   emailNotifications    Boolean @default(true)
+  notifyNewRegister     Boolean @default(false)
+  notifyPayment         Boolean @default(true)
+  notifyOverdue         Boolean @default(true)
+  notifyExpiring        Boolean @default(true)
   autoChargeEnabled     Boolean @default(false)
   autoChargeDay         Int     @default(5)
   lateFeePercentage     Float   @default(2.0)

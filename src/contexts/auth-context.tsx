@@ -11,35 +11,45 @@ export interface AuthUser {
   phone: string | null;
   role: string;
   plan: string;
+  planExpiresAt: string | null;
+  trialDaysLeft: number | null;
+  trialExpired: boolean;
   companyName: string | null;
-  companyLogo: string | null;
-  companyCRECI: string | null;
-  creci: string | null;
   companyEmail: string | null;
   companyPhone: string | null;
-  companyAddress: string | null;
-  addressStreet: string | null;
-  addressNumber: string | null;
-  addressComplement: string | null;
-  addressNeighborhood: string | null;
-  addressCity: string | null;
-  addressState: string | null;
-  addressZipCode: string | null;
+  // endereço da empresa (campos do schema Prisma)
+  companyStreet: string | null;
+  companyNumber: string | null;
+  companyComplement: string | null;
+  companyNeighborhood: string | null;
+  companyCity: string | null;
+  companyState: string | null;
+  companyZipCode: string | null;
+  creciNumber: string | null;
+  creciState: string | null;
+  creci: string | null;
+  logo: string | null;
+  primaryColor: string | null;
+  // WhatsApp
   whatsappEnabled: boolean;
-  whatsappNumber: string | null;
   whatsappApiUrl: string | null;
-  whatsappApiToken: string | null;
+  whatsappApiKey: string | null;
   whatsappInstanceName: string | null;
+  // aliases para compatibilidade com componentes existentes
+  whatsappNumber: string | null;
+  whatsappApiToken: string | null;
   whatsappMessageTemplate: string | null;
+  companyLogo: string | null;
+  // Financeiro
+  emailNotifications: boolean;
+  notifyNewRegister: boolean;
+  notifyPayment: boolean;
+  notifyOverdue: boolean;
+  notifyExpiring: boolean;
   autoChargeEnabled: boolean;
-  chargeGenerationDay: number | null;
-  defaultLateFeePercent: number | null;
-  defaultInterestPercent: number | null;
-  billingAutoCharge: boolean;
-  billingDayGenerate: number;
-  billingLateFeePercent: number;
-  billingInterestPercent: number;
-  billingMessageTemplate: string | null;
+  autoChargeDay: number;
+  lateFeePercentage: number;
+  interestPercentage: number;
   createdAt: string;
   [key: string]: unknown;
 }
