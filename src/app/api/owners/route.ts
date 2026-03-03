@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
         bankAccount: body.bankAccount || undefined,
         bankAccountType: safe.bankAccountType || undefined,
         pixKey: body.pixKey || undefined,
-        status: safe.status || "ACTIVE",
+        status: (safe.status || "ACTIVE") as any,
         notes: body.notes || undefined,
       },
     });

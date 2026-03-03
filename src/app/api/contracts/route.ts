@@ -133,11 +133,11 @@ export async function POST(req: NextRequest) {
         condoFee: body.condoFee,
         iptu: body.iptu,
         depositValue: body.depositValue || 0,
-        depositType: body.depositType || "CASH",
+        depositType: ((body.depositType as string) || "CASH").toUpperCase() as any,
         paymentDay: body.paymentDay,
-        readjustmentIndex: body.readjustmentIndex || "IGPM",
+        readjustmentIndex: ((body.readjustmentIndex as string) || "IGPM").toUpperCase() as any,
         readjustmentMonth: body.readjustmentMonth || 12,
-        status: body.status || "ACTIVE",
+        status: ((body.status as string) || "ACTIVE").toUpperCase() as any,
         clauses: body.clauses?.length > 0
           ? {
               create: body.clauses.map((c: any, idx: number) => ({

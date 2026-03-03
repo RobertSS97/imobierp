@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
         cpf: body.cpf,
         rg: body.rg,
         dateOfBirth: body.dateOfBirth ? new Date(body.dateOfBirth) : undefined,
-        maritalStatus: body.maritalStatus || undefined,
+        maritalStatus: body.maritalStatus ? (body.maritalStatus as string).toUpperCase() as any : undefined,
         profession: body.profession,
         income: body.income ? parseFloat(body.income) : undefined,
         street: body.street,
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
         emergencyName: body.emergencyName,
         emergencyPhone: body.emergencyPhone,
         emergencyRelationship: body.emergencyRelationship,
-        status: body.status || "ACTIVE",
+        status: ((body.status as string) || "ACTIVE").toUpperCase() as any,
         notes: body.notes,
       },
     });

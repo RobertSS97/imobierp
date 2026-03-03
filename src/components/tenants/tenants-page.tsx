@@ -78,13 +78,13 @@ export function TenantsPage() {
     if (prop) {
       setFormData((prev) => ({
         ...prev,
-        addressStreet: prop.addressStreet || prev.addressStreet,
-        addressNumber: prop.addressNumber || prev.addressNumber,
-        addressComplement: prop.addressComplement || prev.addressComplement,
-        addressNeighborhood: prop.addressNeighborhood || prev.addressNeighborhood,
-        addressCity: prop.addressCity || prev.addressCity,
-        addressState: prop.addressState || prev.addressState,
-        addressZipCode: prop.addressZipCode || prev.addressZipCode,
+        addressStreet: prop.street || prev.addressStreet,
+        addressNumber: prop.number || prev.addressNumber,
+        addressComplement: prop.complement || prev.addressComplement,
+        addressNeighborhood: prop.neighborhood || prev.addressNeighborhood,
+        addressCity: prop.city || prev.addressCity,
+        addressState: prop.state || prev.addressState,
+        addressZipCode: prop.zipCode || prev.addressZipCode,
       }));
       setAddressAutoFilled(true);
     }
@@ -112,7 +112,27 @@ export function TenantsPage() {
   const updateField = (field: string, value: string) => setFormData((prev) => ({ ...prev, [field]: value }));
 
   const handleSubmit = async () => {
-    const payload = { ...formData, monthlyIncome: formData.monthlyIncome ? Number(formData.monthlyIncome) : undefined, birthDate: formData.birthDate || undefined, maritalStatus: formData.maritalStatus || undefined };
+    const payload = {
+      name: formData.name, cpf: formData.cpf, rg: formData.rg || undefined,
+      dateOfBirth: formData.birthDate || undefined,
+      maritalStatus: formData.maritalStatus || undefined,
+      profession: formData.profession || undefined,
+      email: formData.email, phone: formData.phone,
+      whatsapp: formData.whatsapp || undefined,
+      street: formData.addressStreet || undefined,
+      number: formData.addressNumber || undefined,
+      complement: formData.addressComplement || undefined,
+      neighborhood: formData.addressNeighborhood || undefined,
+      city: formData.addressCity || undefined,
+      state: formData.addressState || undefined,
+      zipCode: formData.addressZipCode || undefined,
+      emergencyName: formData.emergencyContactName || undefined,
+      emergencyPhone: formData.emergencyContactPhone || undefined,
+      emergencyRelationship: formData.emergencyContactRelation || undefined,
+      income: formData.monthlyIncome ? Number(formData.monthlyIncome) : undefined,
+      employer: formData.employer || undefined,
+      notes: formData.notes || undefined,
+    };
     if (editingId) await updateMutation.mutate({ id: editingId, data: payload }); else await createMutation.mutate(payload);
   };
 
@@ -122,15 +142,15 @@ export function TenantsPage() {
       const t = response.data;
       setFormData({
         name: t.name || "", cpf: t.cpf || "", rg: t.rg || "",
-        birthDate: t.birthDate ? new Date(t.birthDate).toISOString().split("T")[0] : "",
-        maritalStatus: t.maritalStatus || "", profession: t.profession || "",
+        birthDate: t.dateOfBirth ? new Date(t.dateOfBirth).toISOString().split("T")[0] : "",
+        maritalStatus: t.maritalStatus?.toLowerCase() || "", profession: t.profession || "",
         email: t.email || "", phone: t.phone || "", whatsapp: t.whatsapp || "",
-        addressStreet: t.addressStreet || "", addressNumber: t.addressNumber || "",
-        addressComplement: t.addressComplement || "", addressNeighborhood: t.addressNeighborhood || "",
-        addressCity: t.addressCity || "", addressState: t.addressState || "", addressZipCode: t.addressZipCode || "",
-        emergencyContactName: t.emergencyContactName || "", emergencyContactPhone: t.emergencyContactPhone || "",
-        emergencyContactRelation: t.emergencyContactRelation || "",
-        monthlyIncome: t.monthlyIncome?.toString() || "", employer: t.employer || "", notes: t.notes || "",
+        addressStreet: t.street || "", addressNumber: t.number || "",
+        addressComplement: t.complement || "", addressNeighborhood: t.neighborhood || "",
+        addressCity: t.city || "", addressState: t.state || "", addressZipCode: t.zipCode || "",
+        emergencyContactName: t.emergencyName || "", emergencyContactPhone: t.emergencyPhone || "",
+        emergencyContactRelation: t.emergencyRelationship || "",
+        monthlyIncome: t.income?.toString() || "", employer: t.employer || "", notes: t.notes || "",
       });
       setEditingId(id); setIsDialogOpen(true);
       // Detectar imóvel vinculado via contrato ativo
@@ -259,7 +279,7 @@ export function TenantsPage() {
                 <TableCell className="text-muted-foreground">{t.cpf}</TableCell>
                 <TableCell className="text-muted-foreground">{t.phone}</TableCell>
                 <TableCell className="text-muted-foreground">{t.email}</TableCell>
-                <TableCell><Badge className={tenantStatusColors[t.status as TenantStatus] || ""} variant="secondary">{tenantStatusLabels[t.status as TenantStatus] || t.status}</Badge></TableCell>
+                <TableCell><Badge className={tenantStatusColors[t.status?.toLowerCase() as TenantStatus] || ""} variant="secondary">{tenantStatusLabels[t.status?.toLowerCase() as TenantStatus] || t.status}</Badge></TableCell>
                 <TableCell>
                   <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                     <DropdownMenuContent align="end">

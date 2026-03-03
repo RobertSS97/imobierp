@@ -185,7 +185,7 @@ export function PropertiesPage() {
       const response = await propertiesApi.get(id);
       const p = response.data;
       setFormData({
-        title: p.title || "", type: p.type || "apartment",
+        title: p.title || "", type: p.type?.toLowerCase() || "apartment",
         addressStreet: p.street || "", addressNumber: p.number || "",
         addressComplement: p.complement || "", addressNeighborhood: p.neighborhood || "",
         addressCity: p.city || "", addressState: p.state || "",
@@ -423,8 +423,8 @@ export function PropertiesPage() {
                               {[p.street, p.number, p.neighborhood].filter(Boolean).join(", ")}
                             </p>
                             <div className="flex items-center gap-2 mt-2">
-                              <Badge className={`text-xs ${propertyStatusColors[p.status as PropertyStatus] || ""}`} variant="secondary">
-                                {propertyStatusLabels[p.status as PropertyStatus] || p.status}
+                              <Badge className={`text-xs ${propertyStatusColors[p.status?.toLowerCase() as PropertyStatus] || ""}`} variant="secondary">
+                                {propertyStatusLabels[p.status?.toLowerCase() as PropertyStatus] || p.status}
                               </Badge>
                               <span className="text-xs font-medium">{formatCurrency(p.rentValue)}</span>
                             </div>
@@ -533,7 +533,7 @@ export function PropertiesPage() {
                   properties.map((p: any) => (
                     <TableRow key={p.id}>
                       <TableCell className="font-medium">{p.title}</TableCell>
-                      <TableCell>{propertyTypeLabels[p.type as PropertyType] || p.type}</TableCell>
+                      <TableCell>{propertyTypeLabels[p.type?.toLowerCase() as PropertyType] || p.type}</TableCell>
                       <TableCell>{p.owner?.name || ownersList.find((o: any) => o.id === p.ownerId)?.name || "-"}</TableCell>
                       <TableCell className="text-muted-foreground">
                         {[p.street, p.number, p.city].filter(Boolean).join(", ")}
@@ -542,8 +542,8 @@ export function PropertiesPage() {
                       <TableCell>{p.area ? `${p.area}m²` : "-"}</TableCell>
                       <TableCell className="font-medium">{formatCurrency(p.rentValue)}</TableCell>
                       <TableCell>
-                        <Badge className={propertyStatusColors[p.status as PropertyStatus] || ""} variant="secondary">
-                          {propertyStatusLabels[p.status as PropertyStatus] || p.status}
+                        <Badge className={propertyStatusColors[p.status?.toLowerCase() as PropertyStatus] || ""} variant="secondary">
+                          {propertyStatusLabels[p.status?.toLowerCase() as PropertyStatus] || p.status}
                         </Badge>
                       </TableCell>
                       <TableCell>

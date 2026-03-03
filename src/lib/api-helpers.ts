@@ -7,12 +7,14 @@ export function sanitizeBody(body: Record<string, any>, enumFields: string[]): R
   for (const field of enumFields) {
     if (cleaned[field] === "" || cleaned[field] === undefined) {
       cleaned[field] = undefined;
+    } else if (typeof cleaned[field] === "string") {
+      cleaned[field] = cleaned[field].toUpperCase();
     }
   }
   return cleaned;
 }
 
-// Sanitizar dados de update: remove entries com "" para enum e converte tipos
+// Sanitizar dados de update: remove entries com "" para enum, faz uppercase e converte tipos
 export function sanitizeUpdateData(
   data: Record<string, any>,
   enumFields: string[],
@@ -23,8 +25,8 @@ export function sanitizeUpdateData(
   for (const [key, value] of Object.entries(data)) {
     if (value === undefined) continue;
     if (enumFields.includes(key)) {
-      if (value === "") continue; // skip empty enums
-      cleaned[key] = value;
+      if (value === "" || value === null) continue; // skip empty enums
+      cleaned[key] = typeof value === "string" ? value.toUpperCase() : value;
     } else if (dateFields.includes(key)) {
       if (value === "" || value === null) continue;
       cleaned[key] = new Date(value);

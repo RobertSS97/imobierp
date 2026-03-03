@@ -166,10 +166,31 @@ export function OwnersPage() {
   };
 
   const handleSubmit = async () => {
+    const payload = {
+      name: formData.name,
+      cpfCnpj: formData.cpfCnpj,
+      rg: formData.rg || undefined,
+      email: formData.email,
+      phone: formData.phone,
+      whatsapp: formData.whatsapp || undefined,
+      street: formData.addressStreet || undefined,
+      number: formData.addressNumber || undefined,
+      complement: formData.addressComplement || undefined,
+      neighborhood: formData.addressNeighborhood || undefined,
+      city: formData.addressCity || undefined,
+      state: formData.addressState || undefined,
+      zipCode: formData.addressZipCode || undefined,
+      bankName: formData.bankName || undefined,
+      bankAccountType: formData.bankAccountType || undefined,
+      bankAgency: formData.bankAgency || undefined,
+      bankAccount: formData.bankAccount || undefined,
+      pixKey: formData.pixKey || undefined,
+      notes: formData.notes || undefined,
+    };
     if (editingId) {
-      await updateMutation.mutate({ id: editingId, data: formData });
+      await updateMutation.mutate({ id: editingId, data: payload });
     } else {
-      await createMutation.mutate(formData);
+      await createMutation.mutate(payload);
     }
   };
 
@@ -181,19 +202,19 @@ export function OwnersPage() {
         name: owner.name || "",
         cpfCnpj: owner.cpfCnpj || "",
         rg: owner.rg || "",
-        creci: owner.creci || "",
+        creci: "",
         email: owner.email || "",
         phone: owner.phone || "",
         whatsapp: owner.whatsapp || "",
-        addressStreet: owner.addressStreet || "",
-        addressNumber: owner.addressNumber || "",
-        addressComplement: owner.addressComplement || "",
-        addressNeighborhood: owner.addressNeighborhood || "",
-        addressCity: owner.addressCity || "",
-        addressState: owner.addressState || "",
-        addressZipCode: owner.addressZipCode || "",
+        addressStreet: owner.street || "",
+        addressNumber: owner.number || "",
+        addressComplement: owner.complement || "",
+        addressNeighborhood: owner.neighborhood || "",
+        addressCity: owner.city || "",
+        addressState: owner.state || "",
+        addressZipCode: owner.zipCode || "",
         bankName: owner.bankName || "",
-        bankAccountType: owner.bankAccountType || "",
+        bankAccountType: owner.bankAccountType?.toLowerCase() || "",
         bankAgency: owner.bankAgency || "",
         bankAccount: owner.bankAccount || "",
         pixKey: owner.pixKey || "",
@@ -472,8 +493,8 @@ export function OwnersPage() {
                       <TableCell className="text-muted-foreground">{owner.email}</TableCell>
                       <TableCell>{owner._count?.properties || 0}</TableCell>
                       <TableCell>
-                        <Badge className={ownerStatusColors[owner.status as OwnerStatus] || ""} variant="secondary">
-                          {ownerStatusLabels[owner.status as OwnerStatus] || owner.status}
+                        <Badge className={ownerStatusColors[owner.status?.toLowerCase() as OwnerStatus] || ""} variant="secondary">
+                          {ownerStatusLabels[owner.status?.toLowerCase() as OwnerStatus] || owner.status}
                         </Badge>
                       </TableCell>
                       <TableCell>
